@@ -24,12 +24,10 @@ static float wrapClamp(float n, float min, float max)
 static const QString VERTEX_SHADER_SRC = ":/qt/qml/ScratchCPP/Render/shaders/sprite.vert";
 static const QString FRAGMENT_SHADER_SRC = ":/qt/qml/ScratchCPP/Render/shaders/sprite.frag";
 
-#if defined(Q_OS_WASM)
-static const QString SHADER_PREFIX = ""; // compiles, but doesn't work?
-#elif defined(Q_OS_ANDROID)
-static const QString SHADER_PREFIX = "#version 300 es\n";
+#ifdef Q_OS_MACOS
+static const QString SHADER_PREFIX = "#version 410\n";
 #else
-static const QString SHADER_PREFIX = "#version 140\n";
+static const QString SHADER_PREFIX = "#version 300 es\n";
 #endif
 
 static const char *TEXTURE_UNIT_UNIFORM = "u_skin";

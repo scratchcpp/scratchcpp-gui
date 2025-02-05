@@ -35,7 +35,8 @@ uniform vec2 u_skinSize;
 uniform float u_mosaic;
 #endif // ENABLE_mosaic
 
-varying vec2 v_texCoord;
+in vec2 v_texCoord;
+out vec4 fragColor;
 uniform sampler2D u_skin;
 
 // Add this to divisors to prevent division by 0, which results in NaNs propagating through calculations.
@@ -147,16 +148,16 @@ void main()
     }
     #endif // ENABLE_fisheye
 
-    gl_FragColor = texture2D(u_skin, texcoord0);
+    fragColor = texture(u_skin, texcoord0);
 
     #if defined(ENABLE_color) || defined(ENABLE_brightness)
     // Divide premultiplied alpha values for proper color processing
     // Add epsilon to avoid dividing by 0 for fully transparent pixels
-    gl_FragColor.rgb = clamp(gl_FragColor.rgb / (gl_FragColor.a + epsilon), 0.0, 1.0);
+    fragColor.rgb = clamp(fragColor.rgb / (fragColor.a + epsilon), 0.0, 1.0);
 
     #ifdef ENABLE_color
     {
-        vec3 hsv = convertRGB2HSV(gl_FragColor.rgb);
+        vec3 hsv = convertRGB2HSV(fragColor.rgb);
 
         // Force grayscale values to be slightly saturated
         const float minLightness = 0.11 / 2.0;
@@ -167,20 +168,20 @@ void main()
         hsv.x = mod(hsv.x + u_color, 1.0);
         if (hsv.x < 0.0) hsv.x += 1.0;
 
-        gl_FragColor.rgb = convertHSV2RGB(hsv);
+        fragColor.rgb = convertHSV2RGB(hsv);
     }
     #endif // ENABLE_color
 
     #ifdef ENABLE_brightness
-    gl_FragColor.rgb = clamp(gl_FragColor.rgb + vec3(u_brightness), vec3(0), vec3(1));
+    fragColor.rgb = clamp(fragColor.rgb + vec3(u_brightness), vec3(0), vec3(1));
     #endif // ENABLE_brightness
 
     // Re-multiply color values
-    gl_FragColor.rgb *= gl_FragColor.a + epsilon;
+    fragColor.rgb *= fragColor.a + epsilon;
 
     #endif // defined(ENABLE_color) || defined(ENABLE_brightness)
 
     #ifdef ENABLE_ghost
-    gl_FragColor *= u_ghost;
+    fragColor *= u_ghost;
     #endif // ENABLE_ghost
 }
