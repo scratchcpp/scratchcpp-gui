@@ -10,6 +10,10 @@ void scratchcpprender::init()
 
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     format.setSwapInterval(0);
+#ifdef Q_OS_MACOS
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setVersion(3, 2);
+#endif
     QSurfaceFormat::setDefaultFormat(format);
 }
 
